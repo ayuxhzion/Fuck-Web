@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Error</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--paper:#ECEAE1;--ink:#111010;--red:#E8001C;--muted:#9A9890}
+html,body{height:100%;background:var(--paper);overflow:hidden}
+
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");pointer-events:none;z-index:100;animation:grainShift .5s steps(10) infinite}
+@keyframes grainShift{0%,100%{transform:translate(0,0)}10%{transform:translate(-2%,-2%)}20%{transform:translate(2%,1%)}30%{transform:translate(-1%,3%)}40%{transform:translate(3%,-1%)}50%{transform:translate(-2%,2%)}60%{transform:translate(1%,-3%)}70%{transform:translate(-3%,1%)}80%{transform:translate(2%,-2%)}90%{transform:translate(-1%,3%)}}
+
+.vignette{position:fixed;inset:0;background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,.25) 100%);pointer-events:none;z-index:95}
+.scanlines{position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.03) 2px,rgba(0,0,0,.03) 4px);pointer-events:none;z-index:99;animation:scanlineMove 8s linear infinite}
+@keyframes scanlineMove{0%{background-position:0 0}100%{background-position:0 100px}}
+
+.tear-lines{position:fixed;inset:0;pointer-events:none;z-index:96;overflow:hidden}
+.tear{position:absolute;left:0;width:100%;height:2px;background:rgba(0,0,0,.08);animation:tearScroll linear infinite}
+@keyframes tearScroll{0%{transform:translateY(-10vh);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateY(110vh);opacity:0}}
+
+.mesh-grid{position:fixed;inset:-50%;width:200%;height:200%;background-image:linear-gradient(rgba(0,0,0,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.04) 1px,transparent 1px);background-size:60px 60px;transform:perspective(500px) rotateX(60deg);transform-origin:center center;animation:meshFloat 20s ease-in-out infinite;z-index:0;pointer-events:none}
+@keyframes meshFloat{0%,100%{transform:perspective(500px) rotateX(60deg) translateY(0)}50%{transform:perspective(500px) rotateX(60deg) translateY(-30px)}}
+
+.slash{position:fixed;top:-20%;right:-8%;width:55vw;height:140vh;background:#E4E2D9;transform:rotate(8deg);transform-origin:top right;z-index:0;animation:slashPulse 6s ease-in-out infinite}
+@keyframes slashPulse{0%,100%{opacity:1;transform:rotate(8deg) scale(1)}50%{opacity:.7;transform:rotate(8deg) scale(1.02)}}
+
+.particles{position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+.particle{position:absolute;opacity:0;animation:particleFloat linear infinite}
+.particle.circle{border-radius:50%;border:1px solid var(--muted)}
+.particle.cross::before,.particle.cross::after{content:'';position:absolute;background:var(--muted)}
+.particle.cross::before{width:100%;height:1px;top:50%;left:0;transform:translateY(-50%)}
+.particle.cross::after{width:1px;height:100%;left:50%;top:0;transform:translateX(-50%)}
+.particle.square{border:1px solid var(--muted)}
+@keyframes particleFloat{0%{opacity:0;transform:translateY(100vh) rotate(0deg) scale(.5)}10%{opacity:.3}90%{opacity:.3}100%{opacity:0;transform:translateY(-20vh) rotate(720deg) scale(1.2)}}
+
+.watermark{position:fixed;inset:0;z-index:2;pointer-events:none;overflow:hidden;opacity:.04}
+.watermark span{position:absolute;font-family:'Bebas Neue',sans-serif;font-size:15vw;color:var(--ink);letter-spacing:.1em;white-space:nowrap;transform:rotate(-35deg)}
+.watermark span:nth-child(1){top:-10%;left:-20%}
+.watermark span:nth-child(2){top:20%;left:10%}
+.watermark span:nth-child(3){top:50%;left:-10%}
+.watermark span:nth-child(4){top:80%;left:20%}
+
+.crt-wrap{position:fixed;inset:0;z-index:90;pointer-events:none;overflow:hidden}
+.crt-wrap::before{content:'';position:absolute;inset:-20%;background:radial-gradient(ellipse at center,transparent 60%,rgba(0,0,0,.15) 100%);animation:crtBreathe 4s ease-in-out infinite}
+@keyframes crtBreathe{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
+
+.chromatic{position:fixed;inset:0;z-index:97;pointer-events:none;opacity:0;mix-blend-mode:screen}
+.chromatic.active{animation:chromaticFlash .1s ease-out}
+@keyframes chromaticFlash{0%{opacity:.3;background:linear-gradient(90deg,rgba(255,0,0,.1) 0%,transparent 33%,transparent 66%,rgba(0,255,255,.1) 100%)}100%{opacity:0}}
+
+.flicker{position:fixed;inset:0;background:rgba(255,255,255,.04);pointer-events:none;z-index:98;opacity:0}
+.flicker.active{animation:flickerAnim .06s ease-out}
+@keyframes flickerAnim{0%{opacity:1}100%{opacity:0}}
+
+.page{position:relative;z-index:3;height:100vh;display:flex;flex-direction:column;justify-content:center;padding:0 7vw}
+
+.meta{position:fixed;top:36px;left:7vw;display:flex;align-items:center;font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;opacity:0;animation:fadeIn .4s .1s forwards}
+
+.sys-status{position:fixed;top:36px;right:7vw;z-index:10;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;opacity:0;animation:fadeIn .6s 1s forwards;display:flex;align-items:center;gap:8px}
+.sys-status .dot{width:6px;height:6px;background:var(--red);border-radius:50%;animation:statusBlink 1s step-end infinite}
+@keyframes statusBlink{0%,100%{opacity:1;background:var(--red)}50%{opacity:.3;background:var(--muted)}}
+.sys-status .text{color:var(--red);font-weight:700}
+.sys-status .sub{color:var(--muted)}
+
+.hex-counter{position:fixed;top:68px;right:7vw;z-index:10;font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:1px;opacity:0;animation:fadeIn .6s 1.2s forwards}
+
+.quote-area{position:fixed;top:12vh;left:7vw;right:7vw;z-index:10;text-align:center;opacity:0;animation:fadeIn .8s 1.5s forwards}
+.quote-text{font-family:'Cormorant Garamond',serif;font-size:clamp(20px,4vw,42px);font-weight:600;font-style:italic;color:var(--ink);line-height:1.5;letter-spacing:.02em}
+.quote-text .highlight{color:var(--red);font-weight:700;position:relative;display:inline-block}
+.quote-text .highlight::after{content:'';position:absolute;bottom:-3px;left:0;width:100%;height:2px;background:var(--red);transform:scaleX(0);transform-origin:left;animation:highlightLine 2.5s 2s ease-out forwards}
+@keyframes highlightLine{to{transform:scaleX(1)}}
+.quote-text .highlight-glitch{animation:wordGlitch 4s 3s ease-in-out infinite}
+@keyframes wordGlitch{0%,90%,100%{transform:translate(0);filter:none}92%{transform:translate(-2px,1px);filter:hue-rotate(45deg)}94%{transform:translate(2px,-1px);filter:hue-rotate(-45deg)}96%{transform:translate(-1px,0);filter:hue-rotate(90deg)}98%{transform:translate(1px,1px);filter:hue-rotate(-90deg)}}
+.quote-divider{width:80px;height:1px;background:var(--muted);margin:20px auto 0;opacity:.4;position:relative;overflow:hidden}
+.quote-divider::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:var(--red);animation:quoteLineScan 3s linear infinite}
+@keyframes quoteLineScan{0%{left:-100%}100%{left:100%}}
+
+.label-row{display:flex;align-items:center;gap:18px;margin-bottom:10px;opacity:0;animation:slideRight .5s .3s cubic-bezier(.16,1,.3,1) forwards}
+.err-badge{background:var(--red);color:#fff;font-family:'Space Mono',monospace;font-size:9px;font-weight:700;letter-spacing:2px;padding:4px 10px;text-transform:uppercase;position:relative;overflow:hidden}
+.err-badge::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);animation:badgeShine 3s infinite}
+@keyframes badgeShine{0%{left:-100%}20%,100%{left:100%}}
+.subtext{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:3px;text-transform:uppercase}
+
+.headline{font-family:'Space Mono',monospace;font-weight:700;font-size:clamp(13px,2.1vw,26px);color:var(--ink);letter-spacing:.15em;text-transform:uppercase;display:flex;align-items:center;gap:14px;margin-bottom:14px;opacity:0;animation:slideRight .5s .45s cubic-bezier(.16,1,.3,1) forwards}
+.headline .arr{color:var(--red);font-size:1.1em;animation:arrBounce 1.6s 1.2s ease-in-out infinite;display:inline-block}
+@keyframes arrBounce{0%,100%{transform:translateX(0)}50%{transform:translateX(6px)}}
+
+.rule{width:0;height:3px;background:var(--ink);margin-bottom:16px;position:relative;overflow:hidden;animation:ruleGrow .6s .6s cubic-bezier(.16,1,.3,1) forwards}
+.rule::after{content:'';position:absolute;top:0;right:0;width:30px;height:100%;background:var(--red);animation:ruleTip 2s 1.5s ease-in-out infinite alternate}
+@keyframes ruleTip{0%{transform:translateX(0)}100%{transform:translateX(20px);opacity:.5}}
+@keyframes ruleGrow{to{width:100%}}
+
+.fy-wrap{overflow:hidden;line-height:.88;margin-bottom:20px;position:relative}
+.fy-shadow{display:block;font-family:'Bebas Neue',sans-serif;font-size:22.5vw;color:transparent;-webkit-text-stroke:1.5px rgba(0,0,0,.07);letter-spacing:-.01em;line-height:.88;position:absolute;top:4px;left:4px;pointer-events:none;user-select:none;animation:shadowPulse 4s ease-in-out infinite}
+@keyframes shadowPulse{0%,100%{opacity:1;-webkit-text-stroke:1.5px rgba(0,0,0,.07)}50%{opacity:.5;-webkit-text-stroke:1.5px rgba(0,0,0,.03)}}
+.fy{display:block;font-family:'Bebas Neue',sans-serif;font-size:22.5vw;color:var(--red);letter-spacing:-.01em;line-height:.88;transform:translateY(110%);animation:slamUp .7s .65s cubic-bezier(.16,1,.3,1) forwards;cursor:default;user-select:none;position:relative}
+.fy.glitching{animation:glitchShake .15s ease-in-out,slamUp .7s .65s cubic-bezier(.16,1,.3,1) forwards}
+@keyframes slamUp{to{transform:translateY(0)}}
+@keyframes shake{0%{transform:translateX(0) rotate(0deg)}20%{transform:translateX(-6px) rotate(-.8deg)}40%{transform:translateX(6px) rotate(.8deg)}60%{transform:translateX(-4px) rotate(-.4deg)}80%{transform:translateX(4px) rotate(.4deg)}100%{transform:translateX(0) rotate(0deg)}}
+@keyframes glitchShake{0%{transform:translate(0);filter:none}20%{transform:translate(-8px,2px);filter:hue-rotate(90deg)}40%{transform:translate(6px,-3px);filter:hue-rotate(-90deg)}60%{transform:translate(-4px,4px);filter:hue-rotate(45deg)}80%{transform:translate(3px,-2px);filter:hue-rotate(-45deg)}100%{transform:translate(0);filter:none}}
+
+.fy-glitch{position:absolute;top:0;left:0;font-family:'Bebas Neue',sans-serif;font-size:22.5vw;letter-spacing:-.01em;line-height:.88;width:100%;pointer-events:none;opacity:0}
+.fy-glitch.cyan{color:rgba(0,255,255,.6);z-index:-1}
+.fy-glitch.magenta{color:rgba(255,0,255,.6);z-index:-2}
+.fy-wrap:hover .fy-glitch{opacity:.4;animation:glitchLayer .3s ease-in-out infinite}
+.fy-wrap:hover .fy-glitch.cyan{animation:glitchCyan .3s ease-in-out infinite}
+.fy-wrap:hover .fy-glitch.magenta{animation:glitchMagenta .3s ease-in-out infinite}
+@keyframes glitchCyan{0%,100%{transform:translate(0);clip-path:inset(0 0 0 0)}20%{transform:translate(-8px,2px);clip-path:inset(20% 0 60% 0)}40%{transform:translate(4px,-3px);clip-path:inset(50% 0 10% 0)}60%{transform:translate(-6px,1px);clip-path:inset(10% 0 40% 0)}80%{transform:translate(3px,-1px);clip-path:inset(70% 0 5% 0)}}
+@keyframes glitchMagenta{0%,100%{transform:translate(0);clip-path:inset(0 0 0 0)}20%{transform:translate(8px,-2px);clip-path:inset(60% 0 10% 0)}40%{transform:translate(-4px,3px);clip-path:inset(10% 0 50% 0)}60%{transform:translate(6px,-1px);clip-path:inset(40% 0 20% 0)}80%{transform:translate(-3px,1px);clip-path:inset(5% 0 70% 0)}}
+
+.bottom-row{display:flex;justify-content:space-between;align-items:flex-end;opacity:0;animation:fadeIn .5s 1s forwards}
+.bottom-row .note{font-family:'Space Mono',monospace;font-size:10px;font-style:italic;color:var(--muted);letter-spacing:1px;position:relative}
+.bottom-row .note::after{content:'|';animation:blinkCursor 1s step-end infinite;margin-left:2px}
+@keyframes blinkCursor{0%,100%{opacity:1}50%{opacity:0}}
+.bottom-row .code{font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;text-align:right}
+
+.loading-dots{position:fixed;bottom:100px;left:7vw;z-index:10;display:flex;gap:4px;opacity:0;animation:fadeIn .6s 1.3s forwards;align-items:center}
+.loading-dots span{width:4px;height:4px;background:var(--muted);border-radius:50%;animation:loadingBounce 1.4s ease-in-out infinite}
+.loading-dots span:nth-child(1){animation-delay:0s}
+.loading-dots span:nth-child(2){animation-delay:.2s}
+.loading-dots span:nth-child(3){animation-delay:.4s}
+.loading-dots label{font-family:'Space Mono',monospace;font-size:8px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-left:8px}
+@keyframes loadingBounce{0%,80%,100%{transform:scale(0);opacity:.3}40%{transform:scale(1);opacity:1;background:var(--red)}}
+
+.ego-footer{position:fixed;bottom:32px;left:7vw;right:7vw;z-index:10;display:flex;justify-content:space-between;align-items:center;opacity:0;animation:fadeIn .6s 1.4s forwards;gap:20px}
+.ego-left{font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2.5px;text-transform:uppercase;white-space:nowrap;flex-shrink:0}
+.ego-right{font-family:'Bebas Neue',sans-serif;font-size:clamp(16px,3vw,28px);color:var(--red);letter-spacing:3px;text-transform:uppercase;white-space:nowrap;text-align:right;flex-shrink:0;position:relative;min-width:200px}
+.ego-right .ego-text{display:inline-block}
+
+.marquee-strip{position:fixed;bottom:0;left:0;right:0;height:24px;background:var(--ink);z-index:20;overflow:hidden;display:flex;align-items:center;opacity:0;animation:fadeIn .6s 1.6s forwards}
+.marquee-content{display:flex;white-space:nowrap;animation:marqueeScroll 20s linear infinite}
+.marquee-content span{font-family:'Space Mono',monospace;font-size:9px;color:var(--paper);letter-spacing:3px;text-transform:uppercase;padding:0 40px;position:relative}
+.marquee-content span::after{content:'◆';position:absolute;right:0;top:50%;transform:translateY(-50%);color:var(--red);font-size:6px}
+@keyframes marqueeScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+.deco-line{position:fixed;height:1px;background:var(--muted);opacity:.3;z-index:5}
+.deco-line.top-left{top:20px;left:20px;width:60px;animation:lineExtend 1s 1.8s ease-out forwards;transform-origin:left;transform:scaleX(0)}
+.deco-line.top-right{top:20px;right:20px;width:60px;animation:lineExtend 1s 2s ease-out forwards;transform-origin:right;transform:scaleX(0)}
+.deco-line.bottom-left{bottom:64px;left:20px;width:60px;animation:lineExtend 1s 2.2s ease-out forwards;transform-origin:left;transform:scaleX(0)}
+.deco-line.bottom-right{bottom:64px;right:20px;width:60px;animation:lineExtend 1s 2.4s ease-out forwards;transform-origin:right;transform:scaleX(0)}
+@keyframes lineExtend{to{transform:scaleX(1)}}
+
+.blink{display:inline-block;width:5px;height:5px;background:var(--red);border-radius:50%;margin-right:6px;vertical-align:middle;animation:blink 1.2s ease-in-out infinite;box-shadow:0 0 8px var(--red)}
+@keyframes blink{0%,100%{opacity:1;box-shadow:0 0 8px var(--red)}50%{opacity:.3;box-shadow:0 0 2px var(--red)}}
+@keyframes fadeIn{to{opacity:1}}
+@keyframes slideRight{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
+
+.data-rain{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;opacity:.05}
+.rain-col{position:absolute;top:-100%;font-family:'Space Mono',monospace;font-size:10px;color:var(--ink);writing-mode:vertical-rl;text-orientation:upright;letter-spacing:4px;animation:rainFall linear infinite;white-space:nowrap}
+@keyframes rainFall{0%{transform:translateY(0)}100%{transform:translateY(200vh)}}
+
+@media(max-width:480px){
+.fy,.fy-shadow,.fy-glitch{font-size:23vw}
+.meta{display:none}
+.mesh-grid{display:none}
+.data-rain{display:none}
+.sys-status{display:none}
+.hex-counter{display:none}
+.loading-dots{display:none}
+.marquee-strip{display:none}
+.quote-area{top:8vh;left:5vw;right:5vw}
+.quote-text{font-size:18px}
+.ego-footer{bottom:24px;left:5vw;right:5vw;flex-direction:column;align-items:flex-start;gap:6px}
+.ego-right{font-size:20px;letter-spacing:2px;min-width:auto;text-align:left}
+.ego-left{font-size:8px;letter-spacing:1.5px}
+.deco-line.bottom-left,.deco-line.bottom-right{bottom:56px}
+.page{padding:0 5vw}
+}
+</style>
+</head>
+<body>
+<div class="vignette"></div>
+<div class="scanlines"></div>
+<div class="mesh-grid"></div>
+<div class="slash"></div>
+<div class="particles" id="particles"></div>
+<div class="data-rain" id="dataRain"></div>
+<div class="crt-wrap"></div>
+<div class="chromatic" id="chromatic"></div>
+<div class="flicker" id="flicker"></div>
+<div class="tear-lines" id="tearLines"></div>
+
+<div class="watermark">
+<span>REJECTED</span>
+<span>REJECTED</span>
+<span>REJECTED</span>
+<span>REJECTED</span>
+</div>
+
+<div class="deco-line top-left"></div>
+<div class="deco-line top-right"></div>
+<div class="deco-line bottom-left"></div>
+<div class="deco-line bottom-right"></div>
+
+<div class="sys-status">
+<span class="dot"></span>
+<span class="text">SYSTEM OFFLINE</span>
+<span class="sub">// NO SIGNAL</span>
+</div>
+
+<div class="hex-counter" id="hexCounter">0x00000000</div>
+
+<div class="quote-area">
+<div class="quote-text">Your <span class="highlight highlight-glitch">bloodline</span> can't compete with my <span class="highlight highlight-glitch">intelligence</span></div>
+<div class="quote-divider"></div>
+</div>
+
+<div class="meta">
+<span><span class="blink"></span>PROCESS_FAILED · NULL_RETURN</span>
+</div>
+
+<div class="page">
+<div class="label-row">
+<span class="err-badge">ERR 0x00</span>
+<span class="subtext">user_data · not found</span>
+</div>
+
+<div class="headline">
+<span id="headlineText">No user data found</span> <span class="arr">→</span>
+</div>
+
+<div class="rule"></div>
+
+<div class="fy-wrap" id="fyWrap">
+<span class="fy-shadow" aria-hidden="true">FUCK YOU</span>
+<span class="fy-glitch cyan" aria-hidden="true">FUCK YOU</span>
+<span class="fy-glitch magenta" aria-hidden="true">FUCK YOU</span>
+<span class="fy" id="fy">FUCK YOU</span>
+</div>
+
+<div class="bottom-row">
+<span class="note">// process terminated without output</span>
+<span class="code">REF · 404-UD</span>
+</div>
+</div>
+
+<div class="loading-dots">
+<span></span><span></span><span></span>
+<label>Loading Nothing</label>
+</div>
+
+<div class="ego-footer">
+<div class="ego-left">// unauthorized access denied</div>
+<div class="ego-right">
+<span class="ego-text" id="egoText"></span>
+</div>
+</div>
+
+<div class="marquee-strip">
+<div class="marquee-content" id="marqueeContent">
+<span>Access Denied</span>
+<span>Go Away</span>
+<span>Not Your Business</span>
+<span>404 Life Not Found</span>
+<span>Zero Fucks Given</span>
+<span>System Rejected You</span>
+<span>Bye Felicia</span>
+<span>Nice Try Though</span>
+<span>Access Denied</span>
+<span>Go Away</span>
+<span>Not Your Business</span>
+<span>404 Life Not Found</span>
+<span>Zero Fucks Given</span>
+<span>System Rejected You</span>
+<span>Bye Felicia</span>
+<span>Nice Try Though</span>
+</div>
+</div>
+
+<script>
+const pad=n=>String(n).padStart(2,'0');
+
+const hexCounterEl=document.getElementById('hexCounter');
+let hexVal=0;
+function updateHex(){
+hexVal=Math.floor(Math.random()*4294967295);
+hexCounterEl.textContent='0x'+hexVal.toString(16).toUpperCase().padStart(8,'0');
+}
+setInterval(updateHex,800);
+updateHex();
+
+const chromatic=document.getElementById('chromatic');
+const flicker=document.getElementById('flicker');
+
+function triggerGlitch(){
+const fy=document.getElementById('fy');
+fy.classList.add('glitching');
+setTimeout(()=>fy.classList.remove('glitching'),150);
+}
+
+function triggerChromatic(){
+chromatic.classList.add('active');
+setTimeout(()=>chromatic.classList.remove('active'),100);
+}
+
+function triggerFlicker(){
+flicker.classList.add('active');
+setTimeout(()=>flicker.classList.remove('active'),60);
+}
+
+function scheduleEffects(){
+const delay=2000+Math.random()*6000;
+setTimeout(()=>{
+const roll=Math.random();
+if(roll<.4)triggerGlitch();
+else if(roll<.7)triggerChromatic();
+else triggerFlicker();
+scheduleEffects();
+},delay);
+}
+setTimeout(scheduleEffects,2000);
+
+const particlesContainer=document.getElementById('particles');
+const particleTypes=['circle','cross','square'];
+const particleCount=18;
+
+function createParticle(){
+const p=document.createElement('div');
+const type=particleTypes[Math.floor(Math.random()*particleTypes.length)];
+const size=8+Math.random()*20;
+const left=Math.random()*100;
+const duration=12+Math.random()*20;
+const delay=Math.random()*10;
+p.className=`particle ${type}`;
+p.style.cssText=`left:${left}%;width:${size}px;height:${size}px;animation-duration:${duration}s;animation-delay:${delay}s;`;
+particlesContainer.appendChild(p);
+setTimeout(()=>{
+if(p.parentNode)p.remove();
+createParticle();
+},(duration+delay)*1000);
+}
+for(let i=0;i<particleCount;i++)createParticle();
+
+const dataRain=document.getElementById('dataRain');
+const chars='01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+for(let i=0;i<25;i++){
+const col=document.createElement('div');
+col.className='rain-col';
+const left=(i/25)*100+Math.random()*3;
+const duration=8+Math.random()*12;
+const delay=Math.random()*10;
+const length=15+Math.floor(Math.random()*25);
+let text='';
+for(let j=0;j<length;j++)text+=chars[Math.floor(Math.random()*chars.length)];
+col.style.cssText=`left:${left}%;animation-duration:${duration}s;animation-delay:${delay}s;`;
+col.textContent=text;
+dataRain.appendChild(col);
+}
+
+const tearLines=document.getElementById('tearLines');
+function createTear(){
+const tear=document.createElement('div');
+tear.className='tear';
+tear.style.top=Math.random()*100+'%';
+tear.style.animationDuration=(3+Math.random()*5)+'s';
+tear.style.animationDelay=Math.random()*2+'s';
+tearLines.appendChild(tear);
+setTimeout(()=>tear.remove(),8000);
+}
+setInterval(createTear,1500);
+
+const headlineEl=document.getElementById('headlineText');
+const originalText=headlineEl.textContent;
+const scrambleChars='!<>-_\/[]{}—=+*^?#________';
+function scrambleText(element,finalText,duration=1200){
+const length=finalText.length;
+let iteration=0;
+const interval=setInterval(()=>{
+element.textContent=finalText.split('').map((char,index)=>{
+if(index<iteration)return finalText[index];
+if(char===' ')return ' ';
+return scrambleChars[Math.floor(Math.random()*scrambleChars.length)];
+}).join('');
+if(iteration>=length){clearInterval(interval);element.textContent=finalText;}
+iteration+=1/3;
+},duration/(length*3));
+}
+setTimeout(()=>scrambleText(headlineEl,originalText,1500),800);
+
+const egoTexts=["I DON'T GIVE A FUCK","ACCESS DENIED","GO CRY ABOUT IT","NOT MY PROBLEM","SYSTEM REJECTED YOU","404 FUCKS NOT FOUND","UNAUTHORIZED LOSER","BYE FELICIA"];
+const egoTextEl=document.getElementById('egoText');
+let egoIndex=0;
+
+function setEgoText(text){
+egoTextEl.textContent=text;
+egoTextEl.style.opacity='0';
+egoTextEl.style.transform='translateX(20px)';
+egoTextEl.style.transition='none';
+setTimeout(()=>{
+egoTextEl.style.transition='opacity .4s ease, transform .4s cubic-bezier(.16,1,.3,1)';
+egoTextEl.style.opacity='1';
+egoTextEl.style.transform='translateX(0)';
+},50);
+}
+
+function scrambleEgo(text){
+const length=text.length;
+let iteration=0;
+const interval=setInterval(()=>{
+egoTextEl.textContent=text.split('').map((char,index)=>{
+if(index<iteration)return text[index];
+if(char===' ')return ' ';
+return scrambleChars[Math.floor(Math.random()*scrambleChars.length)];
+}).join('');
+if(iteration>=length){clearInterval(interval);setEgoText(text);}
+iteration+=1/2;
+},60);
+}
+
+setTimeout(()=>scrambleEgo(egoTexts[0]),2000);
+setInterval(()=>{
+egoIndex=(egoIndex+1)%egoTexts.length;
+scrambleEgo(egoTexts[egoIndex]);
+},5000);
+
+document.addEventListener('keydown',(e)=>{
+if(e.key===' '||e.key==='Enter'){
+triggerGlitch();
+triggerChromatic();
+for(let i=0;i<5;i++)setTimeout(createParticle,i*100);
+}
+});
+</script>
+</body>
+</html>
